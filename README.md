@@ -1,5 +1,5 @@
 # READ ME:
-Guía para comprender y ejecutar mi proyecto.   
+Guía para comprender y ejecutar mi proyecto.   ¡¡¡Me han salido todos los TESTS!!!
   
 ### RELACIONES Y HERENCIAS:  
 Para comprender las relaciones con las clases tenemos que observar la imagen adjunta como un conjunto de herencias y relaciones. Las **herencias** vienen determinadas por las líneas continuas, las cuales emergen de la clase “account”. Así, “student_checking”, “saving”, “checking”, y “credit_card” comparten atributos con esta. 
