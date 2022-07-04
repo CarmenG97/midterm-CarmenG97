@@ -9,6 +9,8 @@ Por último se encuentra la clase “third-party” que no es un tipo de usuario
 
 **Nota:** Credit_card no incluía fecha de creación en el enunciado pero se la he indicado ya que es otro tipo de cuenta con fecha de creación y agiliza las operaciones. 
 
+![png] ()
+
 ----------------------------------------------------------------------------------------------------------------------------------------
 ### ATRIBUTOS  
 La mayoría de los atributos de las cuentas tienen valores entre un mínimo y un máximo. Por ejemplo, el mínimo balance para la cuenta Saving debe estar comprendido entre 100 y 1000. Para ello recurrimos a spring-boot-starter-validation y así aseguramos que el usuario introduzca valores permitidos. En el caso en que no se requiera ninguno de esos parámetros, se les asigna un número concreto en un constructor (que se podrá cambiar igualmente con el setter). De igual manera ocurre con el secondaryOwner, agregamos un segundo constructor sin esta atributo en cada cuenta de manera que sea opcional introducirlo al instanciar una cuenta. 
