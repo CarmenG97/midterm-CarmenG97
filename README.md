@@ -9,7 +9,7 @@ Por último se encuentra la clase “third-party” que no es un tipo de usuario
 
 **Nota:** Credit_card no incluía fecha de creación en el enunciado pero se la he indicado ya que es otro tipo de cuenta con fecha de creación y agiliza las operaciones. 
 
-![png] (https://github.com/CarmenG97/midterm-CarmenG97/blob/2fc753846addd34330b380f3ef50abb46179c0e0/lastdiagram.png)
+![png](https://github.com/CarmenG97/midterm-CarmenG97/blob/2fc753846addd34330b380f3ef50abb46179c0e0/lastdiagram.png)
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 ### ATRIBUTOS  
