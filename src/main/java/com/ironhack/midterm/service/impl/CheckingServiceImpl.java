@@ -6,8 +6,10 @@ import com.ironhack.midterm.controller.dto.PrimaryOwnerDTO;
 import com.ironhack.midterm.model.Account;
 import com.ironhack.midterm.model.AccountHolder;
 import com.ironhack.midterm.model.Checking;
+import com.ironhack.midterm.model.StudentChecking;
 import com.ironhack.midterm.repository.AccountRepository;
 import com.ironhack.midterm.repository.CheckingRepository;
+import com.ironhack.midterm.repository.StudentCheckingRepository;
 import com.ironhack.midterm.service.interfaces.CheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 
+import java.time.LocalDate;
 import java.util.Currency;
 import java.util.Optional;
 @Service
@@ -26,9 +29,29 @@ public class CheckingServiceImpl implements CheckingService {
     private AccountRepository accountRepository;
 
 
+                               /*#############
+
+                                    ADMINS
+
+                                 #############*/
+
+    // Create a route to create a new account (admins)
+    public Checking store(Checking checking) {
+
+        Checking newChecking = new Checking(checking.getBalance(), checking.getPrimaryOwner(), checking.getSecondaryOwner(), checking.getCreationDate(), checking.getSecretKey(), checking.getStatus());
+        return checkingRepository.save(newChecking);
+    }
+
+
     //Create a route to update the balance of the account (admins)
     public void updateBalance(long accountId, BalanceDTO balanceDTO) {
+
         Money balanceMoney = new Money(balanceDTO.getAmount(), Currency.getInstance(balanceDTO.getCurrency()));
+
+        // Throw exception if money is negative or 0
+        if(balanceMoney.getAmount().compareTo(new BigDecimal("0")) == -1){
+            throw new IllegalArgumentException("Money can not be less than 0 Euros");
+        }
         Optional<Account> optionalAccount = accountRepository.findById(accountId);
         if(!optionalAccount.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found :c");
@@ -40,13 +63,12 @@ public class CheckingServiceImpl implements CheckingService {
     }
 
 
-    // Create a route to create a new account (admins)
 
-    public Checking store(Checking checking) {
-        // Condición if para la edad
-        Checking newChecking = new Checking(checking.getBalance(), checking.getPrimaryOwner(), checking.getSecondaryOwner(), checking.getCreationDate(), checking.getSecretKey(), checking.getStatus());
-        return checkingRepository.save(newChecking);
-    }
+                    /*#########################
+
+                     ACCOUNT HOLDERS
+
+                 ###########################*/
 
 
     // Create a route to update the balance with a secret key (account holders)
@@ -66,7 +88,6 @@ public class CheckingServiceImpl implements CheckingService {
     //Create a route to change the balance of another account with the id and the primary or secondary owner name
     public void changeBalanceByName(long accountId, PrimaryOwnerDTO primaryOwnerDTO, String secretKey, Money transferMoney) {
 
- //       Money transferMoney = new Money(balanceDTO.getAmount(), Currency.getInstance(balanceDTO.getCurrency()));
 
         //The account who suffers the change in the balance
         Optional<Checking> optionalReceivingAccount = checkingRepository.findById(accountId);
@@ -74,10 +95,14 @@ public class CheckingServiceImpl implements CheckingService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Checking not found :C");
         }
 
-        //if(optionalReceivingAccount.get().getPrimaryOwner().equals(primaryOwnerDTO)) {
 
             BigDecimal newBalance = optionalReceivingAccount.get().getBalance().increaseAmount(transferMoney);
             Money newBalanceMoney = new Money(newBalance, Currency.getInstance("EUR"));
+
+            // Throw exception if money is 0 or negative
+           if(newBalanceMoney.getAmount().compareTo(new BigDecimal("0")) == -1){
+            throw new IllegalArgumentException("Money can not be less than 0 Euros");
+        }
 
             optionalReceivingAccount.get().setBalance(newBalanceMoney);
 
@@ -95,7 +120,7 @@ public class CheckingServiceImpl implements CheckingService {
             optionalDonorAccount.get().setBalance(newDonorBalanceMoney);
 
             checkingRepository.save(optionalDonorAccount.get()); // I save the donor account with the modified balance
-         //        }
+
     }
 
 

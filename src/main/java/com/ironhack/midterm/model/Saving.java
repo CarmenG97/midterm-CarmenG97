@@ -59,16 +59,17 @@ public class Saving extends Account {
         this.status = status;
     }
 
-    /*
+
     //Optional secondary owner
-    public Saving(Money balance, AccountHolder primaryOwner, Money penaltyFee, String creationDate, BigDecimal interestRate, BigDecimal minimumBalance, String secretKey, Status status) {
-        super(balance, primaryOwner, penaltyFee, creationDate);
+
+
+    public Saving(Money balance, AccountHolder primaryOwner, Date creationDate, BigDecimal interestRate, BigDecimal minimumBalance, String secretKey, Status status) {
+        super(balance, primaryOwner, creationDate);
         this.interestRate = interestRate;
         this.minimumBalance = minimumBalance;
         this.secretKey = secretKey;
         this.status = status;
     }
-    */
 
     // If any account drops below the minimumBalance, the penaltyFee should be deducted from the balance automatically
     public void checkMinBalance(){
@@ -126,10 +127,8 @@ public class Saving extends Account {
     }
 
 
-    // I introduce the new balance in the getter
+
     public Money getBalance() {
-        checkMinBalance();
-        updateInterest();
         return super.getBalance();
     }
 

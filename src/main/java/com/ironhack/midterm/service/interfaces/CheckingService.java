@@ -3,6 +3,7 @@ package com.ironhack.midterm.service.interfaces;
 import com.ironhack.midterm.classes.Money;
 import com.ironhack.midterm.controller.dto.BalanceDTO;
 import com.ironhack.midterm.controller.dto.PrimaryOwnerDTO;
+import com.ironhack.midterm.model.Account;
 import com.ironhack.midterm.model.AccountHolder;
 import com.ironhack.midterm.model.Checking;
 
@@ -14,7 +15,7 @@ public interface CheckingService {
 
     Money findBalanceBySecretKey(String secretKey);
 
-    Checking store(Checking checking);
+    Account store(Checking checking);
 
     void delete(long accountId);
 

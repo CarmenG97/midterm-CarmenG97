@@ -14,9 +14,6 @@ import java.util.Optional;
 
 public interface CheckingController {
 
-//    List<Checking> findAll();
-//    Checking findById(long accountId);
-
     void updateBalance(long accountId, BalanceDTO balanceDTO);
 
     Checking store(Checking checking);

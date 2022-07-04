@@ -40,19 +40,20 @@ public class CheckingControllerImpl implements CheckingController {
         return checkingRepository.findAll();
     }
 
-    // Admins should be able to access the balance for any account and to modify it
-    @PatchMapping("/checking/{id}/balance")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void updateBalance(@PathVariable(name = "id") long accountId, @RequestBody @Valid BalanceDTO checkingBalanceDTO) {
-        checkingService.updateBalance(accountId, checkingBalanceDTO);
-    }
-
     // Admins can create new accounts
     @PostMapping("/checking")
     @ResponseStatus(HttpStatus.CREATED)
     public Checking store(@RequestBody @Valid Checking checking) {
 
         return checkingRepository.save(checking);
+    }
+
+
+    // Admins should be able to access the balance for any account and to modify it
+    @PatchMapping("/checking/{id}/balance")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void updateBalance(@PathVariable(name = "id") long accountId, @RequestBody @Valid BalanceDTO checkingBalanceDTO) {
+        checkingService.updateBalance(accountId, checkingBalanceDTO);
     }
 
 

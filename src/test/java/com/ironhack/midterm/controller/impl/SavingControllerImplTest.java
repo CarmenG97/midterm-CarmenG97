@@ -6,12 +6,10 @@ import com.ironhack.midterm.classes.Money;
 import com.ironhack.midterm.controller.dto.BalanceDTO;
 import com.ironhack.midterm.controller.dto.PrimaryOwnerDTO;
 import com.ironhack.midterm.enums.Status;
-import com.ironhack.midterm.model.AccountHolder;
-import com.ironhack.midterm.model.Checking;
-import com.ironhack.midterm.model.Role;
-import com.ironhack.midterm.model.User;
+import com.ironhack.midterm.model.*;
 import com.ironhack.midterm.repository.AccountHolderRepository;
 import com.ironhack.midterm.repository.CheckingRepository;
+import com.ironhack.midterm.repository.SavingRepository;
 import com.ironhack.midterm.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,21 +23,21 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-
 import java.math.BigDecimal;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-class CheckingControllerImplTest {
+class SavingControllerImplTest {
 
     @Autowired
-    CheckingRepository checkingRepository;
+    SavingRepository savingRepository;
 
     @Autowired
     AccountHolderRepository accountHolderRepository;
@@ -54,11 +52,12 @@ class CheckingControllerImplTest {
     private MockMvc mockMvc; // Simular peticiones HTTP
     private final ObjectMapper objectMapper = new ObjectMapper(); // Contruir Objetos JSON a partir de clase de JAVA
 
-    private Checking checking1, checking2;
+    private Saving saving1, saving2;
 
     //Create two different users and roles
     private User accountHolder, admin;
     private Role accountHolderRole, adminRole;
+
 
 
     @BeforeEach
@@ -74,7 +73,7 @@ class CheckingControllerImplTest {
 
         userRepository.saveAll(List.of(accountHolder, admin)); // Save the data
 
-        // Create the checkings
+        // Create the savings
 
         Money balance1 = new Money(new BigDecimal("3000"), Currency.getInstance("EUR"));
         Address address1 = new Address("C/Granada", "Algeciras", 11201);
@@ -94,18 +93,16 @@ class CheckingControllerImplTest {
 
         accountHolderRepository.saveAll(List.of(primaryOwner2, secondaryOwner2));
 
+        saving1 = new Saving(balance1, primaryOwner1, secondaryOwner1, new Date(116, 5,3), new BigDecimal("0"), new BigDecimal("200"), "1234",  Status.ACTIVE);
+        saving2 = new Saving(balance1, primaryOwner2, secondaryOwner2, new Date(122, 4,12), new BigDecimal("0"), new BigDecimal("200"),  "756", Status.ACTIVE);
 
-        checking1 = new Checking(balance1, primaryOwner1, secondaryOwner1, new Date(116, 5,3), "1244", Status.ACTIVE);
-        checking2 = new Checking(balance1, primaryOwner2, secondaryOwner2, new Date(122, 4,12), "756", Status.ACTIVE);
-
-        checkingRepository.saveAll(List.of(checking1, checking2));
-
+        savingRepository.saveAll(List.of(saving1, saving2));
     }
 
     @AfterEach
     void tearDown() {
 
-        checkingRepository.deleteAll();
+        savingRepository.deleteAll();
         userRepository.deleteAll();
     }
 
@@ -121,16 +118,17 @@ class CheckingControllerImplTest {
         httpHeaders.add("Authorization", "Basic YWRtaW46MTIzNDU2");
 
         MvcResult mvcResult = mockMvc.perform(
-                get("/checkings")
-                        .headers(httpHeaders)
+                        get("/savings")
+                                .headers(httpHeaders)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andReturn();
 
-        assertTrue(mvcResult.getResponse().getContentAsString().contains(checking1.getBalance().getAmount().toString()));
-        assertTrue(mvcResult.getResponse().getContentAsString().contains(checking2.getSecretKey()));
+        assertTrue(mvcResult.getResponse().getContentAsString().contains(saving1.getBalance().getAmount().toString()));
+        assertTrue(mvcResult.getResponse().getContentAsString().contains(saving2.getSecretKey()));
     }
+
 
     @Test
     void updateBalance_Balance_NewAccount() throws Exception {
@@ -144,7 +142,7 @@ class CheckingControllerImplTest {
         String body = objectMapper.writeValueAsString(balanceDTO);
 
         MvcResult mvcResult = mockMvc.perform(
-                        patch("/checking/" + checking1.getAccountId() + "/balance")
+                        patch("/checking/" + saving1.getAccountId() + "/balance")
                                 .content(body)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .headers(httpHeaders)
@@ -152,9 +150,9 @@ class CheckingControllerImplTest {
                 .andExpect(status().isNoContent())
                 .andReturn();
 
-        Optional<Checking> optionalChecking = checkingRepository.findById(checking1.getAccountId());
-        assertTrue(optionalChecking.isPresent());
-        assertEquals(newBalance.getAmount(), optionalChecking.get().getBalance().getAmount());
+        Optional<Saving> optionalSaving = savingRepository.findById(saving1.getAccountId());
+        assertTrue(optionalSaving.isPresent());
+        assertEquals(newBalance.getAmount(), optionalSaving.get().getBalance().getAmount());
 
     }
 
@@ -171,12 +169,12 @@ class CheckingControllerImplTest {
         AccountHolder secondaryOwner_pepe = new AccountHolder("Pepe", new Date(110, 8, 15), address_pepe, "pepe@hotmail.com");
         accountHolderRepository.saveAll(List.of(primaryOwner_pepa, secondaryOwner_pepe));
 
-        Checking newChecking = new Checking(balance, primaryOwner_pepa, secondaryOwner_pepe, new Date(119, 11,24), "593", Status.FROZEN);
+        Saving newSaving = new Saving(balance, primaryOwner_pepa, secondaryOwner_pepe, new Date(119, 11,24), new BigDecimal("0"), new BigDecimal("200"),"593", Status.FROZEN);
 
-        String body = objectMapper.writeValueAsString(newChecking);
+        String body = objectMapper.writeValueAsString(newSaving);
 
         MvcResult mvcResult = mockMvc.perform(
-                        post("/checking")
+                        post("/saving")
                                 .content(body)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .headers(httpHeaders)
@@ -188,11 +186,15 @@ class CheckingControllerImplTest {
 
     }
 
+
+
                   /*#########################
 
                      ACCOUNT HOLDERS
 
                  ###########################*/
+
+
 
     @Test
     void getBalanceBySecretKey_SecretKey_Balance() throws Exception {
@@ -200,7 +202,7 @@ class CheckingControllerImplTest {
         httpHeaders.add("Authorization", "Basic YWNjb3VudEhvbGRlcjoxMjM0NTY=");
 
         MvcResult mvcResult = mockMvc.perform(
-                        get("/checking/" + checking1.getSecretKey())
+                        get("/saving/" + saving1.getSecretKey())
                                 .param("secretKey", "1244")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .headers(httpHeaders)
@@ -212,21 +214,22 @@ class CheckingControllerImplTest {
 
     }
 
-   @Test
+
+    @Test
     void changeBalanceByName_AccountName_NewBalance() throws Exception {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add("Authorization", "Basic YWNjb3VudEhvbGRlcjoxMjM0NTY=");
 
         Money money = new Money(new BigDecimal("50"), Currency.getInstance("EUR"));
 
-        BigDecimal newBalance = checking1.getBalance().increaseAmount(money);
+        BigDecimal newBalance = saving1.getBalance().increaseAmount(money);
 
         PrimaryOwnerDTO primaryOwnerDTO = new PrimaryOwnerDTO("Carmen"); // Receiving person
 
         String body = objectMapper.writeValueAsString(money);
 
         MvcResult mvcResult = mockMvc.perform(
-                        patch("/checking/" + checking1.getAccountId() + "/" + primaryOwnerDTO)
+                        patch("/saving/" + saving1.getAccountId() + "/" + primaryOwnerDTO)
                                 .content(body)
                                 .param("secretKey", "756")
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -235,12 +238,12 @@ class CheckingControllerImplTest {
                 .andExpect(status().isNoContent())
                 .andReturn();
 
-        Optional<Checking> optionalChecking = checkingRepository.findById(checking1.getAccountId());
-        assertTrue(optionalChecking.isPresent());
-        assertEquals(newBalance, optionalChecking.get().getBalance().getAmount());
+        Optional<Saving> optionalSaving = savingRepository.findById(saving1.getAccountId());
+        assertTrue(optionalSaving.isPresent());
+        assertEquals(newBalance, optionalSaving.get().getBalance().getAmount());
 
 
-}
+    }
 
     @Test
     void delete_validId_CheckingRemoved() throws Exception {
@@ -248,12 +251,16 @@ class CheckingControllerImplTest {
         httpHeaders.add("Authorization", "Basic YWNjb3VudEhvbGRlcjoxMjM0NTY=");
 
         MvcResult mvcResult = mockMvc.perform(
-                delete("/checking/" + checking1.getAccountId())
-                        .headers(httpHeaders)
+                        delete("/saving/" + saving1.getAccountId())
+                                .headers(httpHeaders)
                 )
                 .andExpect(status().isNoContent())
                 .andReturn();
-        assertFalse(checkingRepository.existsById(checking1.getAccountId()));
+        assertFalse(savingRepository.existsById(saving1.getAccountId()));
     }
+
+
+
+
 
 }

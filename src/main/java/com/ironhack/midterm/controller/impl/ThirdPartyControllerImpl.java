@@ -18,19 +18,35 @@ public class ThirdPartyControllerImpl implements ThirdPartyController {
     @Autowired
     ThirdPartyService thirdPartyService;
 
-    // ThirdParty can receive and send money to other accounts
+    // Thirdparty can add or remove money from accounts (regardless of type)
     // They must provide the account secret key. So, they can only send or receive money from checkings
 
-    @PatchMapping("thirdParty/{operation}/{id}")
+
+                          //*************************************************
+
+                                               //DEPOSIT MONEY
+
+                        //************************************************
+    @PatchMapping("thirdParty/increase/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void changeBalanceByThirdParty(@PathVariable(name = "id") long accountId, @PathVariable String operation, @RequestHeader String hashKey, @RequestParam String secretKey, @RequestBody @Valid Money transferMoney) {
- //      if(operation == "increase") {
-           thirdPartyService.increaseBalanceByThirdParty(accountId, operation, hashKey, secretKey, transferMoney);
-//       } else {
- //          thirdPartyService.decreaseBalanceByThirdParty(accountId, hashKey, secretKey, transferMoney);
- //      }
-        //FALTA EL DECREASE MONEY, CUANDO EL THIRDPARTY COBRA AL USUARIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+    public void increaseBalanceByThirdParty(@PathVariable(name = "id") long accountId, @RequestHeader String hashKey, @RequestParam String secretKey, @RequestBody @Valid Money transferMoney) {
+
+           thirdPartyService.increaseBalanceByThirdParty(accountId, hashKey, secretKey, transferMoney);
+
     }
 
+                         //*************************************************
+
+                                          //REMOVE MONEY
+
+                         //************************************************
+
+    @PatchMapping("thirdParty/decrease/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void decreaseBalanceByThirdParty(@PathVariable(name = "id") long accountId, @RequestHeader String hashKey, @RequestParam String secretKey, @RequestBody @Valid Money transferMoney) {
+
+        thirdPartyService.decreaseBalanceByThirdParty(accountId, hashKey, secretKey, transferMoney);
+
+    }
 
 }

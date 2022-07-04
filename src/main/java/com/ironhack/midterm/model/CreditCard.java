@@ -22,8 +22,6 @@ public class CreditCard extends Account {
 
     @Max(0)
     @DecimalMax("20")
-    @Min(0)
-    @DecimalMin("10")
     private BigDecimal interestRate;
 
     public CreditCard() {
@@ -50,14 +48,14 @@ public class CreditCard extends Account {
         this.interestRate = new BigDecimal(0.2);
     }
 
-    /*
+
     //optional secondary owner
-    public CreditCard(Money balance, AccountHolder primaryOwner, Money penaltyFee, String creationDate, BigDecimal creditLimit, BigDecimal interestRate) {
-        super(balance, primaryOwner, penaltyFee, creationDate);
+    public CreditCard(Money balance, AccountHolder primaryOwner, Date creationDate, BigDecimal creditLimit, BigDecimal interestRate) {
+        super(balance, primaryOwner, creationDate);
         this.creditLimit = creditLimit;
         this.interestRate = interestRate;
     }
-*/
+
 
                     /////////////////////////////////////
                    //                                 //
@@ -90,6 +88,7 @@ public class CreditCard extends Account {
 
 
         if((monthComparison == 1) && (yearComparison == 0)) { // Next month in the same year
+
             // We update the interest each month, one to one
 
             // The balance is increased by a percentage equal to the interest of the account

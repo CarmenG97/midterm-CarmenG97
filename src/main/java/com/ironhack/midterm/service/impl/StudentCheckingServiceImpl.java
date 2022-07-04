@@ -1,16 +1,11 @@
 package com.ironhack.midterm.service.impl;
 
 import com.ironhack.midterm.classes.Money;
-import com.ironhack.midterm.controller.dto.BalanceDTO;
-import com.ironhack.midterm.controller.dto.DateOfBirthDTO;
 import com.ironhack.midterm.controller.dto.PrimaryOwnerDTO;
 import com.ironhack.midterm.controller.interfaces.CheckingController;
-import com.ironhack.midterm.model.Account;
 import com.ironhack.midterm.model.AccountHolder;
-import com.ironhack.midterm.model.Checking;
 import com.ironhack.midterm.model.StudentChecking;
 import com.ironhack.midterm.repository.StudentCheckingRepository;
-import com.ironhack.midterm.service.interfaces.CheckingService;
 import com.ironhack.midterm.service.interfaces.StudentCheckingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -33,13 +27,7 @@ public class StudentCheckingServiceImpl implements StudentCheckingService {
 
     AccountHolder accountHolder;
 
-//------------------------------------------------------------------
-    Integer todayYear = LocalDate.now().getYear();
-//    Integer birthYear = accountHolder.getDateOfBirth().getYear();
 
-//    Integer age = todayYear - birthYear;
-
-//------------------------------------------------------------------
 
     public StudentChecking store(StudentChecking studentChecking) {
         // Condición if para la edad!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -52,6 +40,7 @@ public class StudentCheckingServiceImpl implements StudentCheckingService {
     public Money findBalanceBySecretKey(String secretKey) {
         Optional<StudentChecking> optionalStudentChecking = studentCheckingRepository.findStudentCheckingBySecretKey(secretKey);
         Optional<Money> optionalMoney = Optional.ofNullable(optionalStudentChecking.get().getBalance());
+
         if (!optionalMoney.isPresent()) {
             // Lanzar error
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student Checking not found :C");
@@ -74,6 +63,11 @@ public class StudentCheckingServiceImpl implements StudentCheckingService {
 
         BigDecimal newBalance = optionalReceivingAccount.get().getBalance().increaseAmount(transferMoney);
         Money newBalanceMoney = new Money(newBalance, Currency.getInstance("EUR"));
+
+        // Throw exception if money is negative or 0
+        if(newBalanceMoney.getAmount().compareTo(new BigDecimal("0")) == -1){
+            throw new IllegalArgumentException("Money can not be less than 0 Euros");
+        }
 
         optionalReceivingAccount.get().setBalance(newBalanceMoney);
 

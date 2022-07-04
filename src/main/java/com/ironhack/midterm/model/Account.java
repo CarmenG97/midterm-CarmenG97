@@ -31,11 +31,11 @@ public abstract class Account {
     // Each account has an accountHolder as primaryOwner and another as secondaryOwner
     @ManyToOne
     @JoinColumn(name = "primary_owner")
-    private AccountHolder primaryOwner;  //Cambiado
+    private AccountHolder primaryOwner;
 
     @ManyToOne
     @JoinColumn(name = "secondary_owner")
-    private AccountHolder secondaryOwner;  //Cambiado
+    private AccountHolder secondaryOwner;
 
     @Embedded
     @AttributeOverrides({
@@ -57,6 +57,14 @@ public abstract class Account {
         this.balance = balance;
         this.primaryOwner = primaryOwner;
         this.secondaryOwner = secondaryOwner;
+        this.penaltyFee = new Money(new BigDecimal("40"), Currency.getInstance("EUR"));
+        this.creationDate = creationDate;
+    }
+
+    // Constructor without secondaryOwner to make it optional
+    public Account(Money balance, AccountHolder primaryOwner, Date creationDate) {
+        this.balance = balance;
+        this.primaryOwner = primaryOwner;
         this.penaltyFee = new Money(new BigDecimal("40"), Currency.getInstance("EUR"));
         this.creationDate = creationDate;
     }

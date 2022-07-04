@@ -25,6 +25,12 @@ public class StudentChecking extends Account {
         this.status = status;
     }
 
+    public StudentChecking(Money balance, AccountHolder primaryOwner, Date creationDate, String secretKey, Status status) {
+        super(balance, primaryOwner, creationDate);
+        this.secretKey = secretKey;
+        this.status = status;
+    }
+
     public String getSecretKey() {
         return secretKey;
     }

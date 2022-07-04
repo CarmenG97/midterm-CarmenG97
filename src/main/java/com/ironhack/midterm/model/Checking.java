@@ -26,6 +26,7 @@ public class Checking extends Account {
 
         }
 
+        // Checking accounts have a default value of minumum balance of 250 and monthly maintenance fee of 12
         public Checking(Money balance, AccountHolder primaryOwner, AccountHolder secondaryOwner, Date creationDate, String secretKey, Status status) {
                 super(balance, primaryOwner, secondaryOwner, creationDate);
                 this.minimumBalance = new BigDecimal("250");
@@ -34,19 +35,18 @@ public class Checking extends Account {
                 this.status = status;
         }
 
-        /*
+
         // Optional secondary owner
-        public Checking(Money balance, AccountHolder primaryOwner, Money penaltyFee, String creationDate, BigDecimal minimumBalance, int monthlyMaintenanceFee, String secretKey, Status status) {
-                super(balance, primaryOwner, penaltyFee, creationDate);
-                this.minimumBalance = new BigDecimal("250");
-                this.monthlyMaintenanceFee = 12;
-                this.secretKey = secretKey;
-                this.status = status;
-        }
 
-         */
+    public Checking(Money balance, AccountHolder primaryOwner, Date creationDate, BigDecimal minimumBalance, int monthlyMaintenanceFee, String secretKey, Status status) {
+        super(balance, primaryOwner, creationDate);
+        this.minimumBalance = minimumBalance;
+        this.monthlyMaintenanceFee = monthlyMaintenanceFee;
+        this.secretKey = secretKey;
+        this.status = status;
+    }
 
-        // If any account drops below the minimumBalance, the penaltyFee should be deducted from the balance automatically
+    // If any account drops below the minimumBalance, the penaltyFee should be deducted from the balance automatically
        public void checkMinBalance(Money balance){
                if(balance.getAmount().compareTo(minimumBalance) == -1){
                    BigDecimal amount = balance.getAmount();

@@ -9,19 +9,6 @@ import org.springframework.stereotype.Service;
 public class AccountHolderServiceImpl implements AccountHolderService {
     @Autowired
     AccountHolderRepository accountHolderRepository;
-/*
-    DateOfBirthDTO dateOfBirthDTO;
-    //Student Checking if the age of primaryHolderAccount is < 24
 
-    Integer todayYear = LocalDate.now().getYear();
-    Integer birthYear = dateOfBirthDTO.getDateOfBirth().getYear();
-
-//    Integer ageAccountHolder = todayYear - birthYear;
-
-    /*
-    if(ageAccountHolder < 24) {
-
-    }
-    */
 
 }

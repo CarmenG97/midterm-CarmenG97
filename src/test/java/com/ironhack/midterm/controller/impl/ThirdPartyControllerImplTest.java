@@ -76,8 +76,14 @@ class ThirdPartyControllerImplTest {
 
     }
 
+                         //*************************************************
+
+                                           //DEPOSIT MONEY
+
+                         //************************************************
+
     @Test
-    void changeBalanceByThirdParty_ValidParameters_NewBalance() throws Exception {
+    void increaseBalanceByThirdParty_ValidParameters_NewBalance() throws Exception {
 
         //They do not need authorization
         Money money = new Money(new BigDecimal("100"), Currency.getInstance("EUR"));
@@ -86,10 +92,43 @@ class ThirdPartyControllerImplTest {
 
         String body = objectMapper.writeValueAsString(money);
 
-        String operation = "increase";
 
         MvcResult mvcResult = mockMvc.perform(
-                        patch("/thirdParty/" + operation + "/" + checking.getAccountId())
+                        patch("/thirdParty/increase/" + checking.getAccountId())
+                                .content(body)
+                                .header("hashKey", "asad")
+                                .param("secretKey", "1234")
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent())
+                .andReturn();
+
+        Optional<Checking> optionalChecking = checkingRepository.findById(checking.getAccountId());
+        assertTrue(optionalChecking.isPresent());
+
+        assertEquals(newBalance.getAmount(), optionalChecking.get().getBalance().getAmount());
+
+    }
+
+                         //*************************************************
+
+                                            //REMOVE MONEY
+
+                          //************************************************
+
+    @Test
+    void decreaseBalanceByThirdParty_ValidParameters_NewBalance() throws Exception {
+
+        //They do not need authorization
+        Money money = new Money(new BigDecimal("100"), Currency.getInstance("EUR"));
+
+        Money newBalance = new Money(checking.getBalance().decreaseAmount(money), Currency.getInstance("EUR"));
+
+        String body = objectMapper.writeValueAsString(money);
+
+
+        MvcResult mvcResult = mockMvc.perform(
+                        patch("/thirdParty/decrease/" + checking.getAccountId())
                                 .content(body)
                                 .header("hashKey", "asad")
                                 .param("secretKey", "1234")

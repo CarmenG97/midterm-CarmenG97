@@ -23,49 +23,49 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
     @Autowired
     private CheckingRepository checkingRepository;
 
+    // Thirdparty can add or remove money from accounts (regardless of type)
 
-    // Thirdparty deposits money into the account
+                    //*************************************************
 
-    public void increaseBalanceByThirdParty(long accountId, String operation, String hashKey, String secretKey, Money transferMoney) {
+                                     //DEPOSIT MONEY
+
+                    //************************************************
+
+    public void increaseBalanceByThirdParty(long accountId, String hashKey, String secretKey, Money transferMoney) {
 
         //The account who suffers the change in the balance
         Optional<Checking> optionalReceivingChecking = checkingRepository.findById(accountId);
-        if(!optionalReceivingChecking.isPresent()) {
+        if (!optionalReceivingChecking.isPresent()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Account not found :C");
         }
 
-        if(optionalReceivingChecking.get().getSecretKey().equals(secretKey)) {
+        if (optionalReceivingChecking.get().getSecretKey().equals(secretKey)) {
 
             BigDecimal newBalance;
 
-            if(operation == "increase") {
 
                 newBalance = optionalReceivingChecking.get().getBalance().increaseAmount(transferMoney);
                 Money newBalanceMoney = new Money(newBalance, Currency.getInstance("EUR"));
-                optionalReceivingChecking.get().setBalance(newBalanceMoney);
-                checkingRepository.save(optionalReceivingChecking.get()); // I save the receiving account with the modified balance
 
-            } else if (operation == "decrease"){
+                // Throw exception if money is negative or 0
+                if (newBalanceMoney.getAmount().compareTo(new BigDecimal("0")) == -1) {
+                    throw new IllegalArgumentException("Money can not be less than 0 Euros");
+                }
 
-                newBalance = optionalReceivingChecking.get().getBalance().decreaseAmount(transferMoney);
-                Money newBalanceMoney = new Money(newBalance, Currency.getInstance("EUR"));
                 optionalReceivingChecking.get().setBalance(newBalanceMoney);
                 checkingRepository.save(optionalReceivingChecking.get()); // I save the receiving account with the modified balance
 
             }
 
- //           Money newBalanceMoney = new Money(newBalance, Currency.getInstance("EUR"));
-
-//            optionalReceivingChecking.get().setBalance(newBalanceMoney);
-
-//            checkingRepository.save(optionalReceivingChecking.get()); // I save the receiving account with the modified balance
 
         }
 
-    }
+                     //*************************************************
 
-    /*
-    // Thirdparty collects money from the account
+                                     //REMOVE MONEY
+
+                      //************************************************
+
 
     public void decreaseBalanceByThirdParty(long accountId, String hashKey, String secretKey, Money transferMoney) {
 
@@ -83,10 +83,8 @@ public class ThirdPartyServiceImpl implements ThirdPartyService {
             optionalReceivingChecking.get().setBalance(newBalanceMoney);
 
             checkingRepository.save(optionalReceivingChecking.get()); // I save the receiving account with the modified balance
-
         }
 
     }
-*/
 
 }
